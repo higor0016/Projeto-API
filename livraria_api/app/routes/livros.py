@@ -30,3 +30,26 @@ class LivrosList(Resource):
         db.session.add(novo_livro)
         db.session.commit()
         return {'Message': 'Livro Criado com Sucesso!'}, 201
+    
+
+@livros_ns.route('/update/<int:id>')
+class LivrosUpdate(Resource):
+
+    def put(self, id):
+        livro = Livro.query.get(id)
+        if not livro:
+            return {"Mensagem":"Livro não encontrado"}, 404
+        
+        dados = livros_ns.payload
+
+        try:
+            livro.titulo = dados.get('titulo', livro.titulo)
+            livro.ano_publicacao = dados.get('ano_publicacao', livro.ano_publicacao)
+            livro.autor = dados.get('autor', livro.autor)
+
+            db.session.commit()
+            return {"Mensagem":"Livro atualizado com sucesso!"},200
+        
+        except Exception as e:
+            db.session.rollback() # Para reverter as alterações em caso de problemas
+            return {"Mensagem": f"Erro ao atualizar livro: {str(e)}"},500
