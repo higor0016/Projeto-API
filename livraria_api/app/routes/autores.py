@@ -33,3 +33,41 @@ class AutoresList(Resource):
         db.session.commit()
         return {'Message': 'Autor Criado com Sucesso!'}, 201
         
+
+@autores_ns.route('/update/<int:id>')
+class AutoresUpdate(Resource):
+
+    #Função para atualizar um autores
+    def put(self, id):
+        autor = Autor.query.get(id)
+        if not autor:
+            return {"Mensagem":"Autor não encontrado"}, 404
+        
+        dados = autores_ns.payload
+
+        try:
+            autor.nome = dados.get('nome', autor.nome)
+            autor.biografia = dados.get('biografia', autor.biografia)
+
+            db.session.commit()
+            return {"Mensagem":"Autor atualizado com sucesso!"},200
+        
+        except Exception as e:
+            db.session.rollback() # Para reverter as alterações em caso de problemas
+            return {"Mensagem": f"Erro ao atualizar autor: {str(e)}"},500
+        
+
+@autores_ns.route('/delete/<int:id>')
+class AutorDelete(Resource):
+    def delete(self, id):
+        autor = Autor.query.get(id)
+        if not autor:
+            return {"Mensagem":"Autor não encontrado"}, 404
+
+        try:  
+            db.session.delete(autor)
+            db.session.commit()
+            return {"Mensagem":"Autor excluído com sucesso"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"Mensagem": f"Erro ao excluir o Autor: {str(e)}"},500

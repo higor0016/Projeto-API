@@ -35,6 +35,7 @@ class LivrosList(Resource):
 @livros_ns.route('/update/<int:id>')
 class LivrosUpdate(Resource):
 
+    #Função para atualizar um livro
     def put(self, id):
         livro = Livro.query.get(id)
         if not livro:
@@ -53,3 +54,20 @@ class LivrosUpdate(Resource):
         except Exception as e:
             db.session.rollback() # Para reverter as alterações em caso de problemas
             return {"Mensagem": f"Erro ao atualizar livro: {str(e)}"},500
+        
+    
+
+@livros_ns.route('/delete/<int:id>')
+class LivroDelete(Resource):
+    def delete(self, id):
+        livro = Livro.query.get(id)
+        if not livro:
+            return {"Mensagem":"Livro não encontrado"}, 404
+
+        try:  
+            db.session.delete(livro)
+            db.session.commit()
+            return {"Mensagem":"Livro excluído com sucesso"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"Mensagem": f"Erro ao excluir o livro: {str(e)}"},500
