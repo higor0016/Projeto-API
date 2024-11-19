@@ -5,6 +5,7 @@ from app.models.models import Livro
 
 #Definindo namespace para organziar as rotas
 livros_ns = Namespace('livros', description='Operações relacionadas a livros')
+
 livro_model = livros_ns.model('Livro', {
     'id': fields.Integer,
     'titulo': fields.String,
@@ -37,7 +38,8 @@ class LivrosUpdate(Resource):
 
     #Função para atualizar um livro
     def put(self, id):
-        livro = Livro.query.get(id)
+        livro = db.session.get(Livro, id)
+        #livro = Livro.query.get(id)
         if not livro:
             return {"Mensagem":"Livro não encontrado"}, 404
         
@@ -60,7 +62,11 @@ class LivrosUpdate(Resource):
 @livros_ns.route('/delete/<int:id>')
 class LivroDelete(Resource):
     def delete(self, id):
-        livro = Livro.query.get(id)
+        livro = db.session.get(Livro, id)
+        print(f'Id do Livro: {livro}')
+        #livro1 = Livro.query.get(id)
+        #print(f'Id do Livro: {livro1}')
+
         if not livro:
             return {"Mensagem":"Livro não encontrado"}, 404
 

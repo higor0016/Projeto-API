@@ -14,8 +14,6 @@ def create_app():
     app = Flask(__name__)
     api = Api(app, title='API de Livraria', version='1.0', description='API simples de Livraria')
 
-    
-
      # Configurações da aplicação
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:higorlucas016@localhost:5432/livrariaDB'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -37,8 +35,6 @@ def create_app():
        
 
     #Registro de Rotas
-    
-    
     api.add_namespace(livros_ns)
     api.add_namespace(autores_ns)
 
