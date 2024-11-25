@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from flask import request
 from app.models.models import Autor
 from app.extensions import db
+from flask_jwt_extended import jwt_required
 
 
 
@@ -14,6 +15,7 @@ autor_model = autores_ns.model('Livro', {
     'biografia': fields.String,
 })
 
+@jwt_required()
 @autores_ns.route('/')
 class AutoresList(Resource):
     #Manipulação da lista de Autores
