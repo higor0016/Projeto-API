@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from flask import request
 from app.extensions import db
 from app.models.models import Livro
+from flask_jwt_extended import jwt_required
 
 #Definindo namespace para organziar as rotas
 livros_ns = Namespace('livros', description='Operações relacionadas a livros')
@@ -20,11 +21,13 @@ class LivrosList(Resource):
     @livros_ns.marshal_list_with(livro_model)
 
     #função get para pegar os livros
+    @jwt_required()
     def get(self):
         livros = Livro.query.all()
         return [{'id': livro.id, 'titulo': livro.titulo, 'autor': livro.autor, 'ano_publicacao': livro.ano_publicacao} for livro in livros]
 
     #Função para criar um novo livro
+    @jwt_required()
     def post(self):
         data = request.get_json()
         novo_livro = Livro(titulo=data['titulo'],autor=data['autor'], ano_publicacao=data['ano_publicacao'] )
@@ -37,6 +40,7 @@ class LivrosList(Resource):
 class LivrosUpdate(Resource):
 
     #Função para atualizar um livro
+    @jwt_required()
     def put(self, id):
         livro = db.session.get(Livro, id)
         #livro = Livro.query.get(id)
@@ -61,6 +65,7 @@ class LivrosUpdate(Resource):
 
 @livros_ns.route('/delete/<int:id>')
 class LivroDelete(Resource):
+    @jwt_required()
     def delete(self, id):
         livro = db.session.get(Livro, id)
         print(f'Id do Livro: {livro}')

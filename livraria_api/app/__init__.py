@@ -1,10 +1,12 @@
 from flask import Flask
 from .routes.livros import livros_ns 
 from .routes.autores import autores_ns 
+from .routes.login import login_ns
 from flask_restx import Api
 from sqlalchemy import text
 from app.extensions import db
 from app.extensions import jwt
+import os
 import datetime
 
 # Para ler as chaves:
@@ -16,11 +18,11 @@ def create_app():
     api = Api(app, title='API de Livraria', version='1.0', description='API simples de Livraria')
 
     #Lendo chave privada
-    private_key = open('.chaves_ssl/jwtRS256', 'r').read()
-    pr_key = serialization.load_ssh_private_key(private_key.encode())
+    private_key = open('.ssh/higor', 'r').read()
+    pr_key = serialization.load_ssh_private_key(private_key.encode(), password=b'teste')
 
     #Lendo chave publica
-    public_key = open('.chaves_ssl/jwtRS256.key.pub', 'r').read()
+    public_key = open('.ssh/higor.pub', 'r').read()
     pubKey = serialization.load_ssh_public_key(public_key.encode())
 
 
@@ -29,6 +31,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     #JWT config
+    app.config['JWT_SECRET_KEY'] = pr_key
     app.config["JWT_PRIVATE_KEY"] = pr_key
     app.config["JWT_PUBLIC_KEY"] = pubKey
     app.config['JWT_ALGORITHM'] = 'RS256'
@@ -54,6 +57,9 @@ def create_app():
     #Registro de Rotas
     api.add_namespace(livros_ns)
     api.add_namespace(autores_ns)
+    api.add_namespace(login_ns, path='/login')
+
+    #api.add_namespace(login_ns)
 
 
     return app

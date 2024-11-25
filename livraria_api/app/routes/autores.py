@@ -9,25 +9,26 @@ from flask_jwt_extended import jwt_required
 #Definindo namespace para organziar as rotas
 autores_ns = Namespace('autores', description='Operações relacionadas a autores')
 
-autor_model = autores_ns.model('Livro', {
+autor_model = autores_ns.model('Autor', {
     'id': fields.Integer,
     'nome': fields.String,
     'biografia': fields.String,
 })
 
-@jwt_required()
 @autores_ns.route('/')
-class AutoresList(Resource):
+class AutoresList(Resource):    
     #Manipulação da lista de Autores
     @autores_ns.doc('listar_autores')
     @autores_ns.marshal_list_with(autor_model)
 
     #Função para pegar os autores
+    @jwt_required()
     def get(self):
         autores = Autor.query.all()
         return [{'id': autor.id, 'nome': autor.nome, 'biografia': autor.biografia} for autor in autores]
 
     #Função para criar um novo autor
+    @jwt_required()
     def post(self):
         data = request.get_json()
         novo_autor = Autor(nome=data['nome'], biografia=data['biografia'])
@@ -38,8 +39,8 @@ class AutoresList(Resource):
 
 @autores_ns.route('/update/<int:id>')
 class AutoresUpdate(Resource):
-
     #Função para atualizar um autores
+    @jwt_required()
     def put(self, id):
         autor = Autor.query.get(id)
         if not autor:
@@ -61,6 +62,7 @@ class AutoresUpdate(Resource):
 
 @autores_ns.route('/delete/<int:id>')
 class AutorDelete(Resource):
+    @jwt_required()
     def delete(self, id):
         autor = Autor.query.get(id)
         if not autor:
